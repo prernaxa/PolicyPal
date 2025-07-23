@@ -1,8 +1,7 @@
-// models/Analysis.js
 import mongoose from 'mongoose';
 
 const AnalysisSchema = new mongoose.Schema({
-  userId: { type: String, required: true }, // 👈 added this
+  userId: { type: String, required: true }, 
   source: { type: String, enum: ['text', 'pdf', 'url'], required: true },
   input: { type: String },
   summary: { type: String },

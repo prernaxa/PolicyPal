@@ -3,13 +3,12 @@ import mongoose from 'mongoose';
 import Analysis from '../../../models/Analysis';
 import { getAuth } from '@clerk/nextjs/server';
 
-// MongoDB connection
+
 const connectDB = async () => {
   if (mongoose.connections[0].readyState) return;
   await mongoose.connect(process.env.MONGODB_URI);
 };
 
-// Helper: Parse OpenAI style summary text with emoji headings into clean fields
 function parseOpenAISummary(raw) {
   const sectionOrder = [
     '📄 Summary',

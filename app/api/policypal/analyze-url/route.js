@@ -10,7 +10,7 @@ import { getAuth } from '@clerk/nextjs/server';
 export async function POST(req) {
   await connectToDB();
 
-  const { userId } = getAuth(req); // 👈 get user ID
+  const { userId } = getAuth(req);
 
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -42,7 +42,7 @@ export async function POST(req) {
     const categories = categorizePolicy(text);
 
     await Analysis.create({
-      userId, // 👈 associate with user
+      userId, 
       source: 'url',
       input: url,
       summary,

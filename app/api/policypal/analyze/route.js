@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { connectToDB } from '@/lib/db';
 import Analysis from '@/models/Analysis';
-import { summarizeWithOpenAI } from '@/lib/openai'; // replaced Gemini
+import { summarizeWithOpenAI } from '@/lib/openai'; 
 import { extractRisks } from '@/lib/extractRisks';
 import { calculateTrustScore } from '@/lib/trustScore';
 import { categorizePolicy } from '@/lib/categorizePolicy';
@@ -11,7 +11,7 @@ import { getAuth } from '@clerk/nextjs/server';
 export async function POST(req) {
   await connectToDB();
 
-  const { userId } = getAuth(req); // 👈 get user ID from Clerk
+  const { userId } = getAuth(req);  //get userId from clerk
 
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -29,7 +29,7 @@ export async function POST(req) {
     const categories = categorizePolicy(text);
 
     const record = await Analysis.create({
-      userId, // 👈 store the user's ID
+      userId, //store the user's ID
       source: 'text',
       input: text,
       summary,
