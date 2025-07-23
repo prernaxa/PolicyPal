@@ -5,9 +5,17 @@ import { summarizeWithOpenAI } from '@/lib/openai'; // replaced Gemini
 import { extractRisks } from '@/lib/extractRisks';
 import { calculateTrustScore } from '@/lib/trustScore';
 import { categorizePolicy } from '@/lib/categorizePolicy';
+import { getAuth } from '@clerk/nextjs/server'; 
+
 
 export async function POST(req) {
   await connectToDB();
+
+  const { userId } = getAuth(req); // 👈 get user ID from Clerk
+
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
 
   const { text } = await req.json();
   if (!text || text.length < 20) {
@@ -15,13 +23,13 @@ export async function POST(req) {
   }
 
   try {
-    const summary = await summarizeWithOpenAI(text); // updated line
-
+    const summary = await summarizeWithOpenAI(text);
     const risks = extractRisks(text);
     const trustScore = calculateTrustScore(text);
     const categories = categorizePolicy(text);
 
     const record = await Analysis.create({
+      userId, // 👈 store the user's ID
       source: 'text',
       input: text,
       summary,

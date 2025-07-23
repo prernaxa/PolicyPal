@@ -3,9 +3,29 @@
 import { useRouter } from 'next/navigation';
 import { Lightbulb, FileText, ShieldCheck, ArrowRight, List } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { SignedIn, SignedOut, SignInButton, useUser } from '@clerk/nextjs';
 
 export default function LandingPage() {
   const router = useRouter();
+  const { isSignedIn } = useUser();
+
+  const handleInsightsClick = () => {
+    if (isSignedIn) {
+      router.push('/analysis-history');
+    } else {
+      // Trigger Clerk sign-in modal
+      document.getElementById('trigger-signin')?.click();
+    }
+  };
+
+  const handleStartAnalyzingClick = () => {
+    if (isSignedIn) {
+      router.push('/analyze-policy');
+    } else {
+      // Trigger Clerk sign-in modal
+      document.getElementById('trigger-signin')?.click();
+    }
+  };
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-[#0f172a] to-[#1e293b] text-white px-6 py-8 flex flex-col">
@@ -17,13 +37,38 @@ export default function LandingPage() {
           </div>
           <h1 className="text-2xl font-bold tracking-tight">PolicyPal</h1>
         </div>
-        <button
-          onClick={() => router.push('/analysis-history')}
-          className="flex items-center gap-2 text-sm bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-lg shadow-md transition"
-        >
-          <List size={18} />
-          Privacy Insights
-        </button>
+
+        <div className="flex items-center gap-4">
+          <button
+            onClick={handleInsightsClick}
+            className="flex items-center gap-2 text-sm bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-lg shadow-md transition"
+          >
+            <List size={18} />
+            Privacy Insights
+          </button>
+
+          {/* Hidden SignInButton used to trigger modal manually */}
+          <SignInButton mode="modal">
+            <button id="trigger-signin" className="hidden" />
+          </SignInButton>
+
+          {/* Auth Button */}
+          <SignedOut>
+            <SignInButton mode="modal">
+              <button className="bg-blue-600 hover:bg-blue-700 px-4 py-2 text-sm font-semibold rounded-lg transition">
+                Get Started
+              </button>
+            </SignInButton>
+          </SignedOut>
+          <SignedIn>
+            <button
+              onClick={() => router.push('/analyze-policy')}
+              className="bg-blue-600 hover:bg-blue-700 px-4 py-2 text-sm font-semibold rounded-lg transition"
+            >
+              Go to Dashboard
+            </button>
+          </SignedIn>
+        </div>
       </header>
 
       {/* Hero Section */}
@@ -73,7 +118,7 @@ export default function LandingPage() {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg text-lg font-semibold shadow-lg"
-          onClick={() => router.push('/analyze-policy')}
+          onClick={handleStartAnalyzingClick}
         >
           Start Analyzing <ArrowRight size={20} />
         </motion.button>

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import mongoose from 'mongoose';
 import Analysis from '../../../models/Analysis';
+import { getAuth } from '@clerk/nextjs/server';
 
 // MongoDB connection
 const connectDB = async () => {
@@ -34,7 +35,6 @@ function parseOpenAISummary(raw) {
     }
   }
 
-  // Build cleaned output
   const cleaned = {};
 
   if (sections['📄 Summary']) {
@@ -42,19 +42,16 @@ function parseOpenAISummary(raw) {
   }
 
   if (sections['🚨 Risks']) {
-    // Risks are bullet points, remove any leading '- ' or '• '
     cleaned.risks = sections['🚨 Risks'].map((line) =>
       line.replace(/^[-•]\s*/, '').trim()
     );
   }
 
   if (sections['🔐 Trust Score']) {
-    // Usually a single line with "x / 10"
     cleaned.trustScore = sections['🔐 Trust Score'].join(' ').trim();
   }
 
   if (sections['🗂️ Categories']) {
-    // Parse categories key: value lines into an object
     const cats = {};
     sections['🗂️ Categories'].forEach((line) => {
       const [key, val] = line.split(':').map((s) => s.trim());
@@ -68,17 +65,21 @@ function parseOpenAISummary(raw) {
   return cleaned;
 }
 
-// GET route to fetch recent 50 analysis entries
-export async function GET() {
+// GET route to fetch recent 50 analysis entries for current user
+export async function GET(req) {
   try {
     await connectDB();
 
-    let analysis = await Analysis.find()
+    const { userId } = getAuth(req);
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    let analysis = await Analysis.find({ userId })
       .sort({ createdAt: -1 })
       .limit(50)
-      .lean(); // plain JS objects
+      .lean();
 
-    // Parse summary fields for each analysis item
     analysis = analysis.map((item) => {
       if (item.summary) {
         try {
@@ -88,7 +89,6 @@ export async function GET() {
             ...parsed,
           };
         } catch {
-          // If parsing fails, just return the original item
           return item;
         }
       }

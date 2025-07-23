@@ -14,9 +14,15 @@ import {
   ShieldCheck,
   FolderOpen,
   Send,
+  LogOut,
 } from 'lucide-react';
+import { useUser, SignOutButton } from '@clerk/nextjs';
 
 export default function PolicyPalPage() {
+  const { isSignedIn } = useUser();
+
+  const MAX_SIZE_BYTES = 2 * 1024 * 1024; // 2MB limit
+
   const [inputType, setInputType] = useState('text');
   const [text, setText] = useState('');
   const [url, setUrl] = useState('');
@@ -25,12 +31,23 @@ export default function PolicyPalPage() {
   const [loading, setLoading] = useState(false);
 
   const handleAnalyze = async () => {
+    if (!isSignedIn) {
+      toast.error('Please sign in to analyze policies.');
+      return;
+    }
+
     if (
       (inputType === 'text' && !text.trim()) ||
       (inputType === 'url' && !url.trim()) ||
       (inputType === 'pdf' && !pdfFile)
     ) {
       toast.error('Please provide valid input.');
+      return;
+    }
+
+    // Extra safety check for PDF file size before sending
+    if (inputType === 'pdf' && pdfFile && pdfFile.size > MAX_SIZE_BYTES) {
+      toast.error('PDF file size must be less than 2MB.');
       return;
     }
 
@@ -81,12 +98,6 @@ export default function PolicyPalPage() {
     }
   };
 
-  const inputOptions = [
-    { type: 'text', label: 'Text', icon: FileText },
-    { type: 'pdf', label: 'PDF', icon: FileInput },
-    { type: 'url', label: 'URL', icon: Link },
-  ];
-
   const renderSummary = (summary) => {
     const sections = summary
       .split(/\n(?=📄|🔒|🚨|🔐|🗂️)/g)
@@ -113,7 +124,6 @@ export default function PolicyPalPage() {
         {sections.map((block, index) => {
           const [headerLine, ...contentLines] = block.trim().split('\n');
 
-          // FIXED LINE:
           const iconKey = Object.keys(sectionIcons).find((key) =>
             headerLine.startsWith(key)
           );
@@ -148,19 +158,42 @@ export default function PolicyPalPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-[#0f172a] to-[#1e293b] text-white px-6 py-12 flex flex-col items-center">
+    <main className="min-h-screen bg-gradient-to-br from-[#0f172a] to-[#1e293b] text-white px-6 py-12 flex flex-col items-center relative">
+
+      {/* NAVBAR SECTION */}
+      <nav className="w-full max-w-4xl flex justify-between items-center mb-10 px-6 py-4 bg-[#0f172a] rounded-xl shadow-md select-none">
+        <div className="flex items-center gap-3">
+
+          <div className="bg-blue-600 p-2 rounded-full shadow-md">
+            <ShieldCheck className="text-white w-6 h-6" />
+          </div>
+          <h1 className="text-2xl font-bold tracking-tight">PolicyPal</h1>
+        </div>
+
+        {isSignedIn && (
+          <SignOutButton>
+            <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 transition text-white font-medium">
+              <LogOut className="w-4 h-4" />
+              Sign Out
+            </button>
+          </SignOutButton>
+        )}
+      </nav>
+
+      {/* PAGE CONTENT */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className="w-full max-w-4xl"
       >
-        <h1 className="text-4xl font-bold mb-6 text-left">
-          PolicyPal AI — Understand Privacy Policies Instantly
-        </h1>
 
         <div className="flex flex-wrap gap-4 mb-6">
-          {inputOptions.map(({ type, label, icon: Icon }) => (
+          {[
+            { type: 'text', label: 'Text', icon: FileText },
+            { type: 'pdf', label: 'PDF', icon: FileInput },
+            { type: 'url', label: 'URL', icon: Link },
+          ].map(({ type, label, icon: Icon }) => (
             <button
               key={type}
               onClick={() => setInputType(type)}
@@ -203,12 +236,21 @@ export default function PolicyPalPage() {
               <span className="text-sm">
                 {pdfFile ? pdfFile.name : 'Click to upload a PDF file'}
               </span>
+              <span className="text-xs text-gray-500">Max file size: 2 MB</span> {/* Added this line */}
               <input
                 id="pdf-upload"
                 type="file"
                 accept=".pdf"
                 className="hidden"
-                onChange={(e) => setPdfFile(e.target.files?.[0] || null)}
+                onChange={(e) => {
+                  const file = e.target.files?.[0] || null;
+                  if (file && file.size > MAX_SIZE_BYTES) {
+                    toast.error('PDF file size must be less than 2MB.');
+                    setPdfFile(null);
+                  } else {
+                    setPdfFile(file);
+                  }
+                }}
               />
             </label>
           )}
@@ -223,10 +265,7 @@ export default function PolicyPalPage() {
           {loading ? (
             <Loader2 className="w-4 h-4 animate-spin" />
           ) : (
-            <motion.div
-              whileHover={{ scale: 1.2 }}
-              className="flex items-center gap-2"
-            >
+            <motion.div whileHover={{ scale: 1.2 }} className="flex items-center gap-2">
               <span>Analyze</span>
               <Send className="w-4 h-4" />
             </motion.div>

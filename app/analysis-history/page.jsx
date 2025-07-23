@@ -28,7 +28,6 @@ export default function DashboardPage() {
     fetchHistory();
   }, []);
 
-  // Parse trustScore string like "7 / 10" to number 7
   const parseTrustScore = (score) => {
     if (typeof score === 'number') return score;
     if (typeof score === 'string') {
@@ -68,7 +67,6 @@ export default function DashboardPage() {
                   whileHover={{ scale: 1.02 }}
                   className="bg-[#1e293b] border border-[#334155] rounded-2xl p-6 shadow-md transition-shadow duration-200"
                 >
-                  {/* Timestamp and Trust Score */}
                   <div className="flex items-center justify-between mb-4">
                     <span className="flex items-center gap-2 text-sm text-gray-400">
                       <CalendarClock className="w-4 h-4" />
@@ -84,7 +82,6 @@ export default function DashboardPage() {
                     </span>
                   </div>
 
-                  {/* Input Source */}
                   {item.input && (
                     <div className="mb-4">
                       <h3 className="font-semibold text-gray-300 mb-1 flex items-center gap-2">
@@ -97,37 +94,40 @@ export default function DashboardPage() {
                     </div>
                   )}
 
-                  {/* Summary */}
                   {item.summary && (
-                    <div className="mb-4 mt-4">
-                      <h3 className="font-semibold text-gray-300 mb-1 flex items-center gap-2">
-                        <FileText className="w-4 h-4" />
-                        Summary
-                      </h3>
-                      <p className="text-md text-gray-200 leading-relaxed">
-                        {item.summary}
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Risks */}
-{item.risks && item.risks.length > 0 && (
-  <div className="mb-6 mt-6">
+  <div className="mb-4 mt-4">
     <h3 className="font-semibold text-gray-300 mb-1 flex items-center gap-2">
-      <AlertTriangle className="w-4 h-4 text-red-400" />
-      Risks
+      <FileText className="w-4 h-4" />
+      Summary
     </h3>
-    <ul className="list-disc list-inside text-sm text-red-300">
-      {item.risks
-        .filter(risk => risk && risk.trim() !== '')
-        .map((risk, i) => (
-          <li key={i}>{risk}</li>
+    <div className="text-md text-gray-200 leading-relaxed space-y-1">
+      {item.summary
+        .split(' - ')
+        .filter((s) => s.trim() !== '')
+        .map((point, idx) => (
+          <p key={idx}>{point.trim().startsWith('-') ? point.trim() : `- ${point.trim()}`}</p>
         ))}
-    </ul>
+    </div>
   </div>
 )}
 
-                  {/* Categories */}
+
+                  {item.risks && item.risks.length > 0 && (
+                    <div className="mb-6 mt-6">
+                      <h3 className="font-semibold text-gray-300 mb-1 flex items-center gap-2">
+                        <AlertTriangle className="w-4 h-4 text-red-400" />
+                        Risks
+                      </h3>
+                      <ul className="list-disc list-inside text-sm text-red-300">
+                        {item.risks
+                          .filter((risk) => risk && risk.trim() !== '')
+                          .map((risk, i) => (
+                            <li key={i}>{risk}</li>
+                          ))}
+                      </ul>
+                    </div>
+                  )}
+
                   {item.categories && (
                     <div>
                       <h3 className="font-semibold text-gray-300 mb-2 flex items-center gap-2">
