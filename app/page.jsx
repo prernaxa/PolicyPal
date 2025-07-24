@@ -13,7 +13,6 @@ export default function LandingPage() {
     if (isSignedIn) {
       router.push('/analysis-history');
     } else {
-      // Trigger Clerk sign-in modal
       document.getElementById('trigger-signin')?.click();
     }
   };
@@ -22,15 +21,14 @@ export default function LandingPage() {
     if (isSignedIn) {
       router.push('/analyze-policy');
     } else {
-      // Trigger Clerk sign-in modal
       document.getElementById('trigger-signin')?.click();
     }
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-[#0f172a] to-[#1e293b] text-white px-6 py-8 flex flex-col">
+    <main className="min-h-screen bg-gradient-to-br from-[#0f172a] to-[#1e293b] text-white px-4 sm:px-6 py-6 sm:py-8 flex flex-col">
       {/* Header */}
-      <header className="flex justify-between font-sans items-center w-full max-w-7xl mx-auto mb-12">
+      <header className="flex justify-between items-center w-full max-w-7xl mx-auto mb-14 sm:mb-16 px-2 sm:px-0">
         <div className="flex items-center gap-3">
           <div className="bg-blue-600 p-2 rounded-full shadow-md">
             <ShieldCheck className="text-white w-6 h-6" />
@@ -47,9 +45,9 @@ export default function LandingPage() {
             Privacy Insights
           </button>
 
-          {/* Hidden SignInButton used to trigger modal manually */}
+          {/* Hidden SignInButton trigger */}
           <SignInButton mode="modal">
-            <button id="trigger-signin" className="hidden" />
+            <button id="trigger-signin" className="hidden" aria-hidden="true" />
           </SignInButton>
 
           {/* Auth Button */}
@@ -95,7 +93,7 @@ export default function LandingPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6, duration: 0.6 }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl w-full mb-12"
+          className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl w-full mb-12 px-2"
         >
           <FeatureCard
             icon={<Lightbulb size={28} />}
@@ -114,14 +112,29 @@ export default function LandingPage() {
           />
         </motion.div>
 
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg text-lg font-semibold shadow-lg"
-          onClick={handleStartAnalyzingClick}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.9, duration: 0.5 }}
+          className="flex flex-col items-center gap-2"
         >
-          Start Analyzing <ArrowRight size={20} />
-        </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg text-lg font-semibold shadow-lg"
+            onClick={handleStartAnalyzingClick}
+          >
+            Start Analyzing
+            <motion.span
+              animate={{ x: [0, 5, 0] }}
+              transition={{ repeat: Infinity, duration: 1.5 }}
+            >
+              <ArrowRight size={20} />
+            </motion.span>
+          </motion.button>
+
+          <p className="text-sm text-gray-400 mt-1">No credit card required • Instant results</p>
+        </motion.div>
       </section>
     </main>
   );
@@ -130,7 +143,7 @@ export default function LandingPage() {
 function FeatureCard({ icon, title, desc }) {
   return (
     <div className="bg-gray-800 p-6 rounded-2xl shadow-lg border border-gray-700 hover:border-blue-500 transition-all duration-300 text-left">
-      <div className="mb-4 text-blue-400">{icon}</div>
+      <div className="mb-4 text-blue-400" aria-hidden="true">{icon}</div>
       <h3 className="text-xl font-semibold mb-2">{title}</h3>
       <p className="text-gray-400 text-sm leading-relaxed">{desc}</p>
     </div>
