@@ -81,7 +81,7 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 ## Sample Output
 
 ```
-Summary
+📋 Summary
 - Company collects email, location, and usage data.
 - Data shared with third-party ad networks and analytics partners.
 
