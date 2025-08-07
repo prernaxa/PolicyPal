@@ -1,6 +1,6 @@
 # PolicyPal — AI-Powered Privacy Policy Analyzer
 
-**PolicyPal** is a full-stack web app that helps users understand privacy policies in plain language using **GPT-4o**, custom NLP, and structured formatting. Upload a PDF, paste text, or submit a URL — PolicyPal summarizes the risks, categories, and assigns a trust score instantly.
+**PolicyPal** is a full-stack web app that helps users understand privacy policies in plain language using **GPT-4o**, custom rule-based NLP, and structured formatting. Upload a PDF, paste text, or submit a URL — PolicyPal summarizes the risks, categories, and assigns a trust score instantly.
 
 ---
 
@@ -81,7 +81,7 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 ## Sample Output
 
 ```
-Summary
+📋 Summary
 - Company collects email, location, and usage data.
 - Data shared with third-party ad networks and analytics partners.
 
