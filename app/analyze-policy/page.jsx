@@ -99,63 +99,71 @@ export default function PolicyPalPage() {
   };
 
   const renderSummary = (summary) => {
-    const sections = summary
-      .split(/\n(?=📄|🔒|🚨|🔐|🗂️)/g)
-      .filter((block) => block.trim() !== '');
+  const sections = summary
+    .split(/\n(?=⚠️|📄|🔒|🚨|🔐|🗂️)/g)
+    .filter((block) => block.trim() !== '');
 
-    const sectionIcons = {
-      '📄 Summary': FileText,
-      '🔒 Summary of the Policy': Lock,
-      '🚨 Risks': AlertTriangle,
-      '🔐 Trust Score': ShieldCheck,
-      '🗂️ Categories': FolderOpen,
-    };
-
-    const sectionColors = {
-      '📄 Summary': 'bg-blue-500',
-      '🔒 Summary of the Policy': 'bg-yellow-500',
-      '🚨 Risks': 'bg-red-500',
-      '🔐 Trust Score': 'bg-green-500',
-      '🗂️ Categories': 'bg-purple-500',
-    };
-
-    return (
-      <div className="space-y-6">
-        {sections.map((block, index) => {
-          const [headerLine, ...contentLines] = block.trim().split('\n');
-
-          const iconKey = Object.keys(sectionIcons).find((key) =>
-            headerLine.startsWith(key)
-          );
-
-          const Icon = sectionIcons[iconKey] || FileText;
-          const bgColor = sectionColors[iconKey] || 'bg-gray-500';
-          const title = headerLine.replace(/^📄|🔒|🚨|🔐|🗂️/, '').trim();
-
-          return (
-            <div
-              key={index}
-              className="bg-gray-800 border border-gray-700 rounded-xl p-5 shadow-md hover:shadow-lg transition-all duration-300"
-            >
-              <div className="flex items-center gap-3 mb-3">
-                <div className={`p-2 rounded-full ${bgColor} bg-opacity-90`}>
-                  <Icon className="w-5 h-5 text-white" />
-                </div>
-                <h2 className="text-lg font-semibold text-white text-left">
-                  {title}
-                </h2>
-              </div>
-              <div className="text-gray-300 pl-1 space-y-2 text-sm leading-relaxed text-left">
-                {contentLines.map((line, i) => (
-                  <p key={i}>{line}</p>
-                ))}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    );
+  const sectionIcons = {
+    '⚠️ Mock Response': AlertTriangle,
+    '📄 Summary': FileText,
+    '🔒 Summary of the Policy': Lock,
+    '🚨 Risks': AlertTriangle,
+    '🔐 Trust Score': ShieldCheck,
+    '🗂️ Categories': FolderOpen,
   };
+
+  const sectionColors = {
+    '⚠️ Mock Response': 'bg-yellow-600',
+    '📄 Summary': 'bg-blue-500',
+    '🔒 Summary of the Policy': 'bg-yellow-500',
+    '🚨 Risks': 'bg-red-500',
+    '🔐 Trust Score': 'bg-green-500',
+    '🗂️ Categories': 'bg-purple-500',
+  };
+
+  return (
+    <div className="space-y-6">
+      {sections.map((block, index) => {
+        const [headerLine, ...contentLines] = block.trim().split('\n');
+
+        // ✅ Fix: only match emoji at start
+        const emojiMatch = headerLine.match(/^(⚠️|📄|🔒|🚨|🔐|🗂️)/);
+        const emoji = emojiMatch?.[1] || '';
+        const fullHeaderKey = Object.keys(sectionIcons).find((key) =>
+          headerLine.startsWith(key)
+        );
+
+        const Icon = sectionIcons[fullHeaderKey] || FileText;
+        const bgColor = sectionColors[fullHeaderKey] || 'bg-gray-500';
+
+        const title = fullHeaderKey
+          ? fullHeaderKey.replace(emoji, '').trim()
+          : headerLine.replace(emoji, '').trim();
+
+        return (
+          <div
+            key={index}
+            className="bg-gray-800 border border-gray-700 rounded-xl p-5 shadow-md hover:shadow-lg transition-all duration-300"
+          >
+            <div className="flex items-center gap-3 mb-3">
+              <div className={`p-2 rounded-full ${bgColor} bg-opacity-90`}>
+                <Icon className="w-5 h-5 text-white" />
+              </div>
+              <h2 className="text-lg font-semibold text-white text-left">
+                {title}
+              </h2>
+            </div>
+            <div className="text-gray-300 pl-1 space-y-2 text-sm leading-relaxed text-left">
+              {contentLines.map((line, i) => (
+                <p key={i}>{line}</p>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-[#0f172a] to-[#1e293b] text-white px-6 py-12 flex flex-col items-center relative">

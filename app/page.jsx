@@ -27,47 +27,46 @@ export default function LandingPage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-[#0f172a] to-[#1e293b] text-white px-4 sm:px-6 py-6 sm:py-8 flex flex-col">
-      {/* Header */}
       <header className="flex justify-between items-center w-full max-w-7xl mx-auto mb-14 sm:mb-16 px-2 sm:px-0">
-        <div className="flex items-center gap-3">
-          <div className="bg-blue-600 p-2 rounded-full shadow-md">
-            <ShieldCheck className="text-white w-6 h-6" />
-          </div>
-          <h1 className="text-2xl font-bold tracking-tight">PolicyPal</h1>
-        </div>
+  <div className="flex items-center gap-3">
+    <div className="bg-blue-600 p-2 rounded-full shadow-md">
+      <ShieldCheck className="text-white w-6 h-6" />
+    </div>
+    <h1 className="text-2xl font-bold tracking-tight">PolicyPal</h1>
+  </div>
 
-        <div className="flex items-center gap-4">
-          <button
-            onClick={handleInsightsClick}
-            className="flex items-center gap-2 text-sm bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-lg shadow-md transition"
-          >
-            <List size={18} />
-            Privacy Insights
-          </button>
+  <div className="flex items-center gap-2">
+    <button
+      onClick={handleInsightsClick}
+      className="flex items-center ml-2 sm:ml-0 gap-1 text-xs sm:text-sm bg-gray-800 hover:bg-gray-700 px-3  py-2 rounded-md shadow transition h-9"
+    >
+      <List size={16} />
+      Privacy Insights
+    </button>
 
-          {/* Hidden SignInButton trigger */}
-          <SignInButton mode="modal">
-            <button id="trigger-signin" className="hidden" aria-hidden="true" />
-          </SignInButton>
+    <SignInButton mode="modal">
+      <button id="trigger-signin" className="hidden" aria-hidden="true" />
+    </SignInButton>
 
-          {/* Auth Button */}
-          <SignedOut>
-            <SignInButton mode="modal">
-              <button className="bg-blue-600 hover:bg-blue-700 px-4 py-2 text-sm font-semibold rounded-lg transition">
-                Get Started
-              </button>
-            </SignInButton>
-          </SignedOut>
-          <SignedIn>
-            <button
-              onClick={() => router.push('/analyze-policy')}
-              className="bg-blue-600 hover:bg-blue-700 px-4 py-2 text-sm font-semibold rounded-lg transition"
-            >
-              Go to Dashboard
-            </button>
-          </SignedIn>
-        </div>
-      </header>
+    <SignedOut>
+      <SignInButton mode="modal">
+        <button className="bg-blue-600 hover:bg-blue-700 px-3 py-0.5 text-xs sm:text-sm font-medium rounded-md transition h-9">
+          Get Started
+        </button>
+      </SignInButton>
+    </SignedOut>
+
+    <SignedIn>
+      <button
+        onClick={() => router.push('/analyze-policy')}
+        className="bg-blue-600 hover:bg-blue-700 px-3 py-0.5 text-xs sm:text-sm font-medium rounded-md transition h-9"
+      >
+        Go to Dashboard
+      </button>
+    </SignedIn>
+  </div>
+</header>
+
 
       {/* Hero Section */}
       <section className="flex flex-col items-center justify-center flex-1 text-center px-4">
