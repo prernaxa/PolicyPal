@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic"; // 🔹 Prevent Next.js build-time execution
+
 import { NextResponse } from 'next/server';
 import { connectToDB } from '@/lib/db';
 import Analysis from '@/models/Analysis';
@@ -8,8 +10,6 @@ import { categorizePolicy } from '@/lib/categorizePolicy';
 import { getAuth } from '@clerk/nextjs/server'; 
 
 export async function POST(req) {
-  await connectToDB();
-
   const { userId } = getAuth(req);
 
   if (!userId) {
@@ -22,6 +22,8 @@ export async function POST(req) {
   }
 
   try {
+    await connectToDB(); // ✅ Lazy-load DB
+
     const res = await fetch(url);
     const html = await res.text();
 
@@ -36,6 +38,7 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Could not extract meaningful text.' }, { status: 400 });
     }
 
+    // ✅ Lazy-load OpenAI
     const summary = await summarizeWithOpenAI(text);
     const risks = extractRisks(text);
     const trustScore = calculateTrustScore(text);
@@ -53,12 +56,7 @@ export async function POST(req) {
 
     return NextResponse.json({
       success: true,
-      data: {
-        summary,
-        risks,
-        trustScore,
-        categories,
-      },
+      data: { summary, risks, trustScore, categories },
     });
   } catch (err) {
     console.error('URL analysis error:', err);

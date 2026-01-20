@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic"; // 🔹 Must be at the top
+
 import { NextResponse } from 'next/server';
 import { connectToDB } from '@/lib/db';
 import Analysis from '@/models/Analysis';
@@ -11,16 +13,18 @@ import pdf from 'pdf-parse/lib/pdf-parse.js';
 export const config = { api: { bodyParser: false } };
 
 export async function POST(req) {
-  await connectToDB();
-
   const { userId } = getAuth(req);
+
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   try {
+    await connectToDB(); // ✅ Lazy-load DB connection
+
     const formData = await req.formData();
     const file = formData.get('file');
+
     if (!file) {
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
     }
@@ -38,6 +42,7 @@ export async function POST(req) {
     const data = await pdf(buffer);
     const text = data.text;
 
+    // ✅ Lazy-load OpenAI here
     const summary = await summarizeWithOpenAI(text);
     const risks = extractRisks(text);
     const trustScore = calculateTrustScore(text);
@@ -55,12 +60,7 @@ export async function POST(req) {
 
     return NextResponse.json({
       success: true,
-      data: {
-        summary,
-        risks,
-        trustScore,
-        categories,
-      },
+      data: { summary, risks, trustScore, categories },
     });
   } catch (err) {
     console.error('PDF analysis error:', err);
