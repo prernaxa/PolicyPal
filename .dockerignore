@@ -1,7 +1,18 @@
+# dependencies
 node_modules
+
+# next.js build output
 .next
-.git
+out
+
+# env files
 .env
 .env.local
-Dockerfile
-docker-compose.yml
+
+# git
+.git
+.gitignore
+
+# misc
+npm-debug.log*
+yarn-debug.log*
